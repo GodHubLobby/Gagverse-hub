@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gagverse Hub Rewards</title>
+    <title>Gagverse Hub - Shop & Crew</title>
     <!-- Load Tailwind CSS for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -15,24 +15,65 @@
             50% { color: #d8b4fe; text-shadow: 0 0 6px #d8b4fe; } /* Lavender */
         }
         
-        /* Defines the subtle text shift for secondary elements (usernames, bios) */
+        /* Defines the subtle text shift for secondary elements */
         @keyframes text-shift {
-            0%, 100% { opacity: 0.95; color: #a5b4fc; } /* Light Blue */
-            50% { opacity: 1; color: #ffffff; } /* White */
+            0%, 100% { opacity: 0.95; color: #a5b4fc; }
+            50% { opacity: 1; color: #ffffff; }
         }
 
-        /* Defines the star twinkling effect */
+        /* Twinkling star effect for Main and Rewards page */
         @keyframes twinkle {
             0% { opacity: 0; }
             50% { opacity: 1; }
             100% { opacity: 0; }
         }
 
-        /* Defines the CTA button pulse */
-        @keyframes cta-pulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 10px 15px rgba(147, 51, 234, 0.5); }
-            50% { transform: scale(1.02); box-shadow: 0 15px 20px rgba(147, 51, 234, 0.7); }
+        /* --- SHOP PAGE: SHOOTING STAR EFFECT --- */
+        @keyframes meteor {
+            0% { transform: rotate(215deg) translateX(0); opacity: 1; }
+            70% { opacity: 1; }
+            100% { transform: rotate(215deg) translateX(-1500px); opacity: 0; }
         }
+
+        .shooting-star {
+            position: absolute;
+            background: linear-gradient(to right, #ffffff, rgba(255, 255, 255, 0));
+            width: 500px;
+            height: 1px;
+            animation: meteor 5s infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* --- CARD GLOW EFFECT --- */
+        
+        @keyframes border-glow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        /* Wrapper for all cards */
+        .card-wrapper {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* The actual glowing border element */
+        .card-glow-border {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            z-index: -1;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #000000, #ffffff, #000000, #ffffff);
+            background-size: 400% 400%;
+            opacity: 0.6;
+            animation: border-glow 15s linear infinite;
+        }
+
 
         /* --- BASE STYLES --- */
         .star-background {
@@ -41,9 +82,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #0d0d1e; /* Deep purple-blue night sky */
+            background-color: #0d0d1e; /* Deep night sky */
             overflow: hidden;
-            z-index: -1; 
+            z-index: -2;
         }
 
         .star {
@@ -62,38 +103,61 @@
             animation: text-shift 4s infinite alternate;
         }
 
-        /* Global Content Style for cards and containers */
+        /* Glassmorphism Card Style for Shop Items */
+        .glass-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            border-color: #6366f1;
+        }
+        
+        /* Global Card Background (for profile and rewards) */
         .card-bg {
             background-color: rgba(18, 24, 47, 0.75);
             backdrop-filter: blur(8px); 
             border: 1px solid rgba(255, 255, 255, 0.1); 
         }
-        
-        /* Custom Button Style for "SEE WHAT WE PROVIDE" */
+
+        /* Custom Button Style for CTAs (Reduced Size) */
         .cta-button {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1rem 2rem;
-            font-size: 1.5rem; 
+            padding: 0.75rem 1.5rem;
+            font-size: 1.25rem;
             font-weight: 800; 
             background: linear-gradient(90deg, #6366f1, #9333ea);
+            box-shadow: 0 10px 15px rgba(147, 51, 234, 0.5); 
             transition: all 0.2s ease-in-out;
             cursor: pointer;
-            animation: cta-pulse 2s infinite alternate;
+            animation: color-pulse 3s infinite alternate;
+            border-radius: 0.75rem;
         }
-        /* Hover effect kept, but pulse handles the default animation */
-        .cta-button:hover {
-            transform: scale(1.03) translateY(-2px);
+        
+        /* --- NEW PAGE TRANSITION STYLES --- */
+        .page-view {
+            position: absolute; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            min-height: 100vh;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+            pointer-events: none; /* Prevents clicks on hidden elements */
+            overflow-y: auto; /* Allows scrolling on content pages */
         }
-
-        /* Style for the Rewards List */
-        .reward-item {
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .reward-item:last-child {
-            border-bottom: none;
+        
+        .page-view.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto; /* Allows interaction when active */
         }
     </style>
 </head>
@@ -101,156 +165,249 @@
 
     <!-- Starry Background Container (Managed by JavaScript) -->
     <div id="star-container" class="star-background"></div>
+    <div id="shooting-star-container" class="star-background hidden"></div>
 
-    <!-- Main View Container: Shows Profiles and CTA -->
-    <div id="main-view" class="p-4 flex flex-col items-center justify-center min-h-screen">
-        <!-- Animated Title -->
+    <!-- MAIN VIEW: Profiles and CTAs -->
+    <div id="main-view" class="page-view p-4 flex flex-col items-center justify-center">
         <h1 class="text-4xl font-extrabold text-center animated-heading mb-10 pt-4">Gagverse Hub</h1>
         
-        <!-- Profiles Grid: Adjusted for 6 profiles -->
+        <!-- Profiles Grid -->
         <div id="profiles-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 max-w-7xl w-full mx-auto">
             <!-- Profile cards will be injected here by JavaScript -->
         </div>
 
-        <!-- CTA Button -->
-        <div class="mt-12 w-full max-w-md">
-             <button onclick="showRewardsPage()" class="cta-button w-full rounded-xl">
+        <!-- CTA Buttons Row (Smaller size) -->
+        <div class="mt-12 w-full max-w-2xl flex flex-col sm:flex-row justify-center gap-6">
+             <!-- Rewards Button -->
+             <button onclick="showRewardsPage()" class="cta-button w-full sm:w-1/2">
                 SEE WHAT WE PROVIDE 
-                <span class="ml-4 transform rotate-90 inline-block text-2xl">
+                <span class="ml-3 transform rotate-90 inline-block text-xl">
                     &#10148;
                 </span>
+            </button>
+            <!-- Shop Button -->
+             <button onclick="showShopPage()" class="cta-button w-full sm:w-1/2">
+                SHOP 🛒
             </button>
         </div>
     </div>
 
-    <!-- Rewards Page Container (Hidden by Default) -->
-    <div id="rewards-view" class="absolute top-0 left-0 w-full p-8 hidden flex-col items-center min-h-screen text-center">
+    <!-- REWARDS VIEW (Page 2) -->
+    <div id="rewards-view" class="page-view p-8 flex-col items-center text-center">
         <div class="w-full max-w-4xl card-bg p-8 rounded-xl shadow-2xl relative">
             <button onclick="showMainPage()" class="absolute top-4 left-4 text-gray-400 hover:text-white transition duration-200 text-lg font-bold animated-text-subtle">&larr; Back to Hub</button>
-            <!-- Animated Rewards Heading -->
             <h2 class="text-3xl font-extrabold animated-heading mt-8 mb-8">Best Invite Rewards</h2>
             
             <p class="text-xl text-gray-300 mb-8 animated-text-subtle">We provide the highest value for growing our community.</p>
 
             <div id="rewards-list" class="mx-auto text-left max-w-xl">
-                <!-- Rewards List Items with animation -->
-                <div class="reward-item animated-text-subtle">
-                    <span class="font-bold text-lg text-green-400">1 INV:</span> 1sx / sab brainrot god
-                </div>
-                <div class="reward-item animated-text-subtle">
-                    <span class="font-bold text-lg text-green-400">2 INV:</span> 5sx / sab secret below 1m
-                </div>
-                <div class="reward-item animated-text-subtle">
-                    <span class="font-bold text-lg text-green-400">3 INV:</span> 15sx / chicken zombie
-                </div>
-                <div class="reward-item animated-text-subtle">
-                    <span class="font-bold text-lg text-green-400">5 INV:</span> 61sx / C kit / sab secret 1m+
-                </div>
-                <div class="reward-item animated-text-subtle">
-                    <span class="font-bold text-lg text-green-400">7 INV:</span> df
-                </div>
-                <div class="reward-item animated-text-subtle">
-                    <span class="font-bold text-lg text-green-400">10 INV:</span> Contact Admin for Special Prize
-                </div>
+                <div class="reward-item animated-text-subtle"><span class="font-bold text-lg text-green-400">1 INV:</span> 1sx / sab brainrot god</div>
+                <div class="reward-item animated-text-subtle"><span class="font-bold text-lg text-green-400">2 INV:</span> 5sx / sab secret below 1m</div>
+                <div class="reward-item animated-text-subtle"><span class="font-bold text-lg text-green-400">3 INV:</span> 15sx / chicken zombie</div>
+                <div class="reward-item animated-text-subtle"><span class="font-bold text-lg text-green-400">5 INV:</span> 61sx / C kit / sab secret 1m+</div>
+                <div class="reward-item animated-text-subtle"><span class="font-bold text-lg text-green-400">7 INV:</span> df</div>
+                <div class="reward-item animated-text-subtle"><span class="font-bold text-lg text-green-400">10 INV:</span> Contact Admin for Special Prize</div>
             </div>
+        </div>
+    </div>
+
+    <!-- SHOP VIEW (Page 3) -->
+    <div id="shop-view" class="page-view p-8 flex-col items-center text-center">
+        <div class="w-full max-w-7xl relative">
+            <button onclick="showMainPage()" class="absolute top-4 left-4 text-gray-400 hover:text-white transition duration-200 text-lg font-bold animated-text-subtle">&larr; Back to Hub</button>
+            <h2 class="text-4xl font-extrabold animated-heading mt-8 mb-10">Gagverse Item Shop</h2>
             
+            <!-- Item Grid: 18 slots in a responsive layout -->
+            <div id="shop-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 w-full mx-auto">
+                <!-- Shop items will be injected here by JavaScript -->
+            </div>
         </div>
     </div>
 
     <script>
-        // --- DATA: Information for all 6 profiles (CUSTOMIZE ALL ENTRIES!) ---
+        // --- DATA: Information for all 6 profiles (CUSTOMIZED) ---
         const teamMembers = [
             { 
                 id: 1, 
                 username: "Matt", 
                 bio: "Owner. Vision to make the server better..", 
-                pfp: "https://i.postimg.cc/QMsq9sW3/tokyo-matt.jpg", // REPLACE WITH PFP LINK
-                discordLink: "https://discord.gg/McSVNGRZzk" // REPLACE WITH INVITE LINK
+                pfp: "https://i.postimg.cc/QMsq9sW3/tokyo-matt.jpg",
+                discordLink: "https://discord.gg/McSVNGRZzk"
             },
             { 
                 id: 2, 
                 username: "Lolzthegreatest", 
                 bio: "Head admin. What does he not have?.", 
                 pfp: "https://i.postimg.cc/XY0CY8TJ/342dar.png",
-                discordLink: "https://discord.gg/McSVNGRZzk" 
+                discordLink: "https://discord.gg/McSVNGRZzk"
             },
             { 
                 id: 3, 
                 username: "Hanan", 
                 bio: "Moderator. Sincere and punctual.", 
                 pfp: "https://i.postimg.cc/ry7dhkNT/3h3gergyguegg.jpg",
-                discordLink: "https://discord.gg/McSVNGRZzk" 
+                discordLink: "https://discord.gg/McSVNGRZzk"
             },
             { 
                 id: 4, 
                 username: "ZEV", 
                 bio: "Always there for the server. respectful.", 
                 pfp: "https://i.postimg.cc/VvW3b1Yj/kongbong.png",
-                discordLink: "https://discord.gg/McSVNGRZzk" 
+                discordLink: "https://discord.gg/McSVNGRZzk"
             },
             { 
                 id: 5, 
                 username: "Nortiim", 
                 bio: "Fun to play with, always active..", 
                 pfp: "https://i.postimg.cc/7Z82Lk5s/momoslilos.jpg",
-                discordLink: "https://discord.gg/McSVNGRZzk" 
+                discordLink: "https://discord.gg/McSVNGRZzk"
             },
             { 
                 id: 6, 
                 username: "Goerge", 
                 bio: "Always fast. Supporter and reliable..", 
                 pfp: "https://i.postimg.cc/tCq99vkQ/popopopolilo.png",
-                discordLink: "https://discord.gg/McSVNGRZzk" 
+                discordLink: "https://discord.gg/McSVNGRZzk"
             }
         ];
 
-        // --- Profile Card Generation HTML Template ---
+        // --- DATA: 18 Shop Items (READY FOR MANUAL EDITING) ---
+        // REPLACE the placeholder values inside the quotes with your actual item data.
+        const shopItems = [
+            { id: 1, name: "Kitsune", price: "7400 ROBUX", img: "https://i.postimg.cc/s2B7yR9P/polzad.jpg" },
+            { id: 2, name: "Raccoon", price: "3000 ROBUX", img: "https://i.postimg.cc/kgHRTprZ/lolozzz.jpg" },
+            { id: 3, name: "Disco Bee", price: "2250 ROBUX", img: "https://i.postimg.cc/XYrpBkZs/maerrit.jpg" },
+            { id: 4, name: "Butterfly", price: "1500 ROBUX", img: "https://i.postimg.cc/hv4GDLWN/09mio.jpg" },
+            { id: 5, name: "Fennec Fox", price: "1500 ROBUX", img: "https://i.postimg.cc/pdDVKGPj/233f.jpg" },
+            { id: 6, name: "Spinosaurus", price: "1000 ROBUX", img: "https://i.postimg.cc/JhcmssQZ/2i9rdik.jpg" },
+            { id: 7, name: "Dragonfly", price: "700 ROBUX", img: "https://i.postimg.cc/CLBgjPNL/3xert.jpg" },
+            { id: 8, name: "Mimic", price: "700 ROBUX", img: "https://i.postimg.cc/2SQgwPBd/8uiokilol.jpg" },
+            { id: 9, name: "Trex", price: "600 ROBUX", img: "https://i.postimg.cc/59H4329V/0239ewdd.jpg" },
+            { id: 10, name: "Lobster", price: "400 ROBUX", img: "https://i.postimg.cc/765kmKkj/frw3yfuf3f.jpg" },
+            { id: 11, name: "Ferret", price: "400 ROBUX", img: "https://i.postimg.cc/13M1SkRT/ferret.jpg" },
+            { id: 12, name: "Queen bee", price: "300 ROBUX", img: "https://i.postimg.cc/nV78rjcS/0police.jpg" },
+            { id: 13, name: "C kitsune", price: "250 ROBUX", img: "https://i.postimg.cc/NFvzmDfk/sd23edwfwffwfw.jpg" },
+            { id: 14, name: "Griffin", price: "200 ROBUX", img: "https://i.postimg.cc/TYGsPtsK/moideen.jpg" },
+            { id: 15, name: "Red fox", price: "100 ROBUX", img: "https://i.postimg.cc/wBtfrZ1k/3edered.jpg" },
+            { id: 16, name: "C Zombie", price: "50 ROBUX", img: "https://i.postimg.cc/wBs22NrV/zombieol.jpg" },
+            { id: 17, name: "100 sx", price: "300 ROBUX", img: "https://i.postimg.cc/YqqxVZV2/8439022d.jpg" },
+            { id: 18, name: "10 sx", price: "50 ROBUX", img: "https://i.postimg.cc/hGx8TBzF/sheckles.jpg" }
+        ];
+
+        // --- HTML TEMPLATES (Unchanged) ---
 
         function createProfileCard(member) {
             return `
-                <div class="card-bg p-4 rounded-xl shadow-2xl transition duration-300 transform hover:scale-[1.05] flex flex-col items-center text-center">
-                    <!-- PFP -->
-                    <img src="${member.pfp}" 
-                         alt="${member.username}'s PFP" 
-                         onerror="this.onerror=null;this.src='https://placehold.co/128x128/334155/ffffff?text=PFP_Error';"
-                         class="w-20 h-20 rounded-full border-3 border-indigo-400 object-cover shadow-lg mb-3">
-                    
-                    <h2 class="text-lg font-extrabold tracking-tight mb-1 text-indigo-300 animated-text-subtle">
-                        ${member.username}
-                    </h2>
-                    
-                    <!-- Bio -->
-                    <p class="text-xs leading-relaxed text-gray-400 mb-4 h-10 animated-text-subtle">
-                        ${member.bio}
-                    </p>
-
-                    <!-- Discord Connection Link -->
-                    <a href="${member.discordLink}" target="_blank" class="mt-auto px-3 py-1 bg-indigo-600 hover:bg-indigo-700 rounded-full text-xs font-bold transition duration-300 animated-text-subtle">
-                        Join Server
-                    </a>
+                <div class="card-wrapper rounded-xl">
+                    <div class="card-glow-border"></div>
+                    <div class="card-bg p-4 rounded-xl shadow-2xl transition duration-300 transform hover:scale-[1.05] flex flex-col items-center text-center relative z-10">
+                        <img src="${member.pfp}" 
+                             alt="${member.username}'s PFP" 
+                             onerror="this.onerror=null;this.src='https://placehold.co/128x128/334155/ffffff?text=PFP_Error';"
+                             class="w-20 h-20 rounded-full border-2 border-indigo-400 object-cover shadow-lg mb-3">
+                        <h2 class="text-lg font-extrabold tracking-tight mb-1 text-indigo-300 animated-text-subtle">
+                            ${member.username}
+                        </h2>
+                        <p class="text-xs leading-relaxed text-gray-400 mb-4 h-10 animated-text-subtle">
+                            ${member.bio}
+                        </p>
+                        <a href="${member.discordLink}" target="_blank" class="mt-auto px-3 py-1 bg-indigo-600 hover:bg-indigo-700 rounded-full text-xs font-bold transition duration-300 animated-text-subtle">
+                            Join Server
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function createShopItemCard(item) {
+            return `
+                <div class="card-wrapper rounded-xl">
+                    <div class="card-glow-border"></div>
+                    <div class="glass-card p-4 rounded-xl shadow-xl flex flex-col items-center text-center transition duration-300 relative z-10">
+                        <img src="${item.img}" 
+                             alt="${item.name}" 
+                             onerror="this.onerror=null;this.src='https://placehold.co/100x100/374151/ffffff?text=Img_Err';"
+                             class="w-24 h-24 rounded-full border-2 border-purple-400 object-cover shadow-md mb-3">
+                        <h3 class="text-md font-bold text-white mb-1 animated-text-subtle">${item.name}</h3>
+                        <p class="text-lg font-extrabold text-green-400 animated-text-subtle">${item.price}</p>
+                        <button class="mt-2 w-full py-1 bg-purple-600 hover:bg-purple-700 text-xs font-bold rounded-lg transition duration-200">
+                            Buy Now
+                        </button>
+                    </div>
                 </div>
             `;
         }
 
-        // --- Navigation Functions (Switches between Main and Rewards view) ---
-        function showRewardsPage() {
-            document.getElementById('main-view').style.display = 'none';
-            document.getElementById('rewards-view').style.display = 'flex';
+        // --- NAVIGATION & BACKGROUND LOGIC ---
+
+        const mainView = document.getElementById('main-view');
+        const rewardsView = document.getElementById('rewards-view');
+        const shopView = document.getElementById('shop-view');
+        const starContainer = document.getElementById('star-container');
+        const shootingStarContainer = document.getElementById('shooting-star-container');
+        const views = [mainView, rewardsView, shopView];
+        
+        function setBackground(type) {
+            starContainer.classList.remove('hidden');
+            shootingStarContainer.classList.remove('hidden');
+
+            if (type === 'shop') {
+                starContainer.classList.add('hidden');
+            } else {
+                shootingStarContainer.classList.add('hidden');
+            }
+        }
+
+        function transitionToPage(targetViewId) {
+            const targetView = document.getElementById(targetViewId);
+            
+            // 1. Fade out the current active view (if any)
+            views.forEach(view => {
+                if (view.classList.contains('active')) {
+                    view.classList.remove('active');
+                }
+            });
+            
+            // 2. Set the correct background instantly
+            setBackground(targetViewId === 'shop-view' ? 'shop' : 'main');
+
+            // 3. Set the target view's display to flex/block so it can start fading in
+            targetView.style.display = 'flex'; 
+
+            // 4. Add 'active' class after a very short delay to trigger the opacity transition
+            setTimeout(() => {
+                targetView.classList.add('active');
+            }, 50);
+
+            // 5. Hide the non-active elements after the transition finishes to prevent overlap
+            setTimeout(() => {
+                views.forEach(view => {
+                    if (!view.classList.contains('active')) {
+                         view.style.display = 'none';
+                    }
+                });
+            }, 550); /* 500ms transition + 50ms buffer */
         }
 
         function showMainPage() {
-            document.getElementById('rewards-view').style.display = 'none';
-            document.getElementById('main-view').style.display = 'flex';
+            transitionToPage('main-view');
         }
 
-        // --- Star Field Generation Script ---
-        const starContainer = document.getElementById('star-container');
+        function showRewardsPage() {
+            transitionToPage('rewards-view');
+        }
+
+        function showShopPage() {
+            transitionToPage('shop-view');
+        }
+
+        // --- Star Field Generation (Unchanged) ---
         const numStars = 100; 
         const random = (min, max) => Math.random() * (max - min) + min;
 
-        function createStar() {
+        function createStar(container, className, durationMin, durationMax, sizeMin, sizeMax) {
             const star = document.createElement('div');
-            star.className = 'star';
+            star.className = className;
             const size = random(1, 3); 
             star.style.width = `${size}px`;
             star.style.height = `${size}px`;
@@ -258,20 +415,36 @@
             star.style.top = `${random(0, 100)}vh`;
             star.style.animationDelay = `${random(0, 5)}s`;
             star.style.animationDuration = `${random(2, 5)}s`;
-            starContainer.appendChild(star);
+            container.appendChild(star);
         }
 
         function generateStars() {
+            // Twinkling stars (for main and rewards views)
             for (let i = 0; i < numStars; i++) {
-                createStar();
+                createStar(starContainer, 'star', 2, 5, 1, 3);
+            }
+            // Shooting stars (for shop view)
+            for (let i = 0; i < 5; i++) { 
+                const meteor = document.createElement('div');
+                meteor.className = 'shooting-star';
+                meteor.style.left = `${random(0, 100)}vw`;
+                meteor.style.top = `${random(0, 100)}vh`;
+                meteor.style.animationDelay = `${random(0, 10)}s`;
+                meteor.style.animationDuration = `${random(3, 8)}s`;
+                shootingStarContainer.appendChild(meteor);
             }
         }
 
-        // Initialize everything on window load
+        // Initialize everything
         window.onload = function() {
             generateStars();
             document.getElementById('profiles-container').innerHTML = teamMembers.map(createProfileCard).join('');
-            showMainPage(); // Ensure the main page is visible first
+            document.getElementById('shop-container').innerHTML = shopItems.map(createShopItemCard).join('');
+            
+            // Set the initial state
+            mainView.classList.add('active');
+            mainView.style.display = 'flex';
+            setBackground('main');
         };
     </script>
 </body>
